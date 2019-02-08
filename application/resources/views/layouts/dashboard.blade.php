@@ -41,6 +41,8 @@
 		<link rel="stylesheet" href="{{ asset('css/datatables/dataTables.bs.min.css') }}">
 		<link rel="stylesheet" href="{{ asset('css/datatables/autoFill.bs.min.css') }}">
 		<link rel="stylesheet" href="{{ asset('css/datatables/fixedHeader.bs.css') }}">
+		<link rel="stylesheet" href="{{ asset('css/users.css') }}">
+		
 
 	</head>
 
@@ -160,9 +162,11 @@
 						<li>
 							<a href='#'>Listar</a>
 						</li>
+						@if(Auth::user()->rol==1)
 						<li>
 							<a href='#'>Agregar</a>
 						</li>
+						@endif
 					</ul>
 				</li>
 				<li>

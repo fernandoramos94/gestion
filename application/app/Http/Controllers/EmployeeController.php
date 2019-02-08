@@ -57,7 +57,7 @@ class EmployeeController extends Controller
         // }
 
         $data = array (
-            "name" => $request->get('last_name')." ".$request->get('last_name'),
+            "name" => $request->get('last_name')." ".$request->get('first_name'),
             "email" => $request->get('email'),
             "rol" => '3',
             "password" => bcrypt($request->get('password'))
@@ -72,7 +72,7 @@ class EmployeeController extends Controller
             "user_id" => $user->id
         );
         Employee::create($data_employe);
-        return redirect("home");
+        return redirect("employee");
     }
 
     /**
