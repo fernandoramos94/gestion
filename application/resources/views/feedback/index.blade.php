@@ -19,27 +19,23 @@
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <div class="panel">
                     <div class="panel-body">
-                    <table id="TablaEmpleado" class="table table-striped table-condensed table-bordered no-margin">
+                    <table id="TablaFeedback" class="table table-striped table-condensed table-bordered no-margin">
 										<thead>
 										  <tr>
-									      <th>Nombre</th>
-									      <th>Apellido</th>
-									      <th>DNI/NIE</th>
-									      <th>Email</th>
-									      <th>Telefono movil</th>
-									      <th>Categoría</th>
+									      <th>Nombre y Apellido</th>
+									      <th>Asunto</th>
+									      <th>Descripción</th>
+									      <th>Fecha de envio</th>
 										  </tr>
 										</thead>
 										  
 										<tbody>
-                                        @foreach ($data as $employee)
+                                        @foreach ($data as $feedback)
                                         <tr>
-												<td>{{ $employee->last_name }}</td>
-												<td>{{$employee->first_name }}</td>
-												<td>{{$employee->DNI_NIE}}</td>
-												<td>{{$employee->email}}</td>
-                                                <td>{{$employee->mobile_phone}}</td>
-                                                <td>{{$employee->categorie}}</td>    
+												<td>{{$feedback->name }}</td>
+												<td>{{$feedback->subject}}</td>
+												<td>{{$feedback->description}}</td>
+                                                <td>{{$feedback->created_at}}</td>  
 										  </tr>
 										  
                                         @endforeach
@@ -63,7 +59,7 @@
 <script type="text/javascript">
 // Basic DataTable
 $(function(){
-	$('#TablaEmpleado').DataTable({
+	$('#TablaFeedback').DataTable({
 		'iDisplayLength': 5,
 	});
 });

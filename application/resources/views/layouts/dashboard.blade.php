@@ -37,6 +37,11 @@
 		<!-- OdoMeter CSS -->
 		<link rel="stylesheet" href="{{ asset('css/odometer.css') }}" />
 
+		<!-- Data Tables -->
+		<link rel="stylesheet" href="{{ asset('css/datatables/dataTables.bs.min.css') }}">
+		<link rel="stylesheet" href="{{ asset('css/datatables/autoFill.bs.min.css') }}">
+		<link rel="stylesheet" href="{{ asset('css/datatables/fixedHeader.bs.css') }}">
+
 	</head>
 
 	<body>
@@ -46,7 +51,7 @@
 
 			<!-- Logo starts -->
 			<a href="index.html" class="logo">
-				<img src="img/logo.png" alt="logo" />
+				<img src="{{ asset('img/logo.png') }}" alt="logo" />
 			</a>
 			<!-- Logo ends -->
 
@@ -55,7 +60,6 @@
 				<li class="list-box user-admin hidden-xs dropdown">
 					<div class="admin-details">
 						<div class="name">{{ Auth::user()->name }}</div>
-						<div class="designation">{{ Auth::user()->rol }}</div>
 					</div>
 					<a id="drop4" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">
 						<i class="icon-user"></i>
@@ -97,7 +101,7 @@
 			<!-- Current user starts -->
 			<div class="user-details clearfix">
 				<a href="profile.html" class="user-img">
-					<img src="img/thumbs/user1.png" alt="User Info">
+					<img src="{{ asset('img/thumbs/user1.png') }}" alt="User Info">
 					<!-- <span class="likes-info">9</span> -->
 				</a>
 				<h5 class="user-name">{{ Auth::user()->name }}</h5>
@@ -112,6 +116,7 @@
 						<span class="menu-item">Inicio</span>
 					</a>
 				</li>
+				  @if(Auth::user()->rol==1)
 				<li>
 					<a href="#">
 						<i class="icon-lab3"></i>
@@ -120,13 +125,15 @@
 					</a>
 					<ul>
 						<li>
-							<a href='#'>Listar</a>
+							<a href="{{url('/employee/')}}">Listar</a>
 						</li>
 						<li>
 							<a href="{{url('/employee/create')}}">Agregar</a>
 						</li>
 					</ul>
 				</li>
+				@endif
+				@if(Auth::user()->rol==1)
 				<li>
 					<a href='#'>
 						<i class="icon-calendar7"></i>
@@ -142,6 +149,7 @@
 						</li>
 					</ul>
 				</li>
+				@endif
 				<li>
 					<a href='#'>
 						<i class="icon-colours"></i>
@@ -160,32 +168,33 @@
 				<li>
 					<a href="#">
 						<i class="icon-head"></i>
-						<span class="menu-item">Contacto</span>
+						<span class="menu-item">Feedback y sugerencias</span>
 						<span class="down-arrow"></span>
 					</a>
 					<ul>
 						<li>
-							<a href='#'>Listar</a>
+							<a href="{{url('/feedback/')}}">Listar</a>
 						</li>
 						<li>
-							<a href='#'>Agregar</a>
+						<a href="{{url('/feedback/create')}}">Agregar</a>
 						</li>
 					</ul>
 				</li>
 				<li>
 					<a href="#">
-						<i class="icon-line-graph"></i>
-						<span class="menu-item">Avisos</span>
+						<i class="icon-head"></i>
+						<span class="menu-item">Datos bancarios</span>
 						<span class="down-arrow"></span>
-					</a>
+					</a >
 					<ul>
 						<li>
-							<a href='#'>Listar</a>
+							<a href="{{url('/bankdata')}}">Listar</a>
 						</li>
 						<li>
-							<a href='#'>Agregar</a>
+						<a href="{{url('/bankdata/create')}}">Agregar</a>
 						</li>
 					</ul>
+				</li>
 			</ul>
 			<!-- Sidebar menu snd -->
 		</div>
@@ -257,7 +266,15 @@
 		<script src="{{ asset('js/circliful/circliful.min.js') }}"></script>
 		<script src="{{ asset('js/circliful/circliful.custom.js') }}"></script>
 
+		<script src="{{ asset('js/datatables/dataTables.min.js') }}"></script>
+		<script src="{{ asset('js/datatables/dataTables.bootstrap.min.js') }}"></script>
+		<script src="{{ asset('js/datatables/dataTables.tableTools.js') }}"></script>
+		<script src="{{ asset('js/datatables/autoFill.min.js')}}"></script>
+		<script src="{{ asset('js/datatables/autoFill.bootstrap.min.js')}}"></script>
+		<script src="{{ asset('js/datatables/fixedHeader.min.js')}}"></script>
+
 		<!-- Custom JS -->
 		<script src="{{ asset('js/custom.js') }}"></script>
+		@yield('js')
 	</body>
 </html>

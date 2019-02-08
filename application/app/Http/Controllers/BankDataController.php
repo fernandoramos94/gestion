@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\BankData;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Storage;
+use Auth;
+use Illuminate\Support\Facades\DB;
 class BankDataController extends Controller
 {
     /**
@@ -14,7 +16,17 @@ class BankDataController extends Controller
      */
     public function index()
     {
-        //
+        if (Auth::user()->rol=='2' || (Auth::user()->rol=='3' )  )  {
+            $bankdata = DB::table('users')
+        ->join('bank_data', 'users.id', '=', 'bank_data.user_id')
+        ->where('users.id', '=', Auth::user()->id)
+        ->get();
+        } else {
+            $bankdata = DB::table('users')
+        ->join('bank_data', 'users.id', '=', 'bank_data.user_id')
+        ->get();
+        }
+        return view('bank_data.index')->with('data',$bankdata);
     }
 
     /**
@@ -24,7 +36,7 @@ class BankDataController extends Controller
      */
     public function create()
     {
-        //
+        return view("bank_data.create");
     }
 
     /**
@@ -35,7 +47,15 @@ class BankDataController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $file = $request->file('url');
+        \Storage::disk('local')->put($file->getClientOriginalName(),  \File::get($file));
+        $data = array (
+            "IBAN" => $request->get('IBAN'),
+            "url" => $file->getClientOriginalName(),
+            'user_id' => Auth::user()->id
+        );
+        Bankdata::create($data);
+        return redirect("home");
     }
 
     /**

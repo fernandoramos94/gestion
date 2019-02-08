@@ -19,7 +19,8 @@
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <div class="panel">
                     <div class="panel-body">
-                        <form action="" method="post">
+                        <form action="{{url('/employee/add')}}" method="post">
+                            {{csrf_field()}}
                             <div class="col-md-12 page-title">
                                 <h4 class="project-name title-border-bottom">Datos personales</h4>
                             </div>
@@ -27,38 +28,40 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="userName">Nombres</label>
-                                    <input type="text" class="form-control" required>
+                                    <input type="text" name="last_name" class="form-control" required>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="userName">Apellidos</label>
-                                    <input type="text" class="form-control" required>
+                                    <input type="text" name="first_name" class="form-control" required>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="userName">DNI/NIE</label>
-                                    <input type="text" class="form-control" required>
+                                    <input type="text" name="DNI_NIE" class="form-control" required>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="userName">Correo electronico</label>
-                                    <input type="email" class="form-control" required>
+                                    <input type="email" name="email" class="form-control" required>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="userName">Telefono movil</label>
-                                    <input type="text" class="form-control" required>
+                                    <input type="text" name="mobile_phone" class="form-control" required>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="userName">categorias</label>
-                                    <select name="" id="" class="form-control" required>
+                                    <select name="categorie" id="" class="form-control" required>
                                         <option value="">-- Seleccione --</option>
+                                        <option value="1">prueba 1</option>
+                                        <option value="2">prueba 2</option>
                                     </select>
                                 </div>
                             </div>
@@ -70,13 +73,13 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="userName">Contraseña</label>
-                                    <input type="password" class="form-control" required>
+                                    <input type="password" name="password" class="form-control" required>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="userName">Confirmar contraseña</label>
-                                    <input type="password" class="form-control" required>
+                                    <input type="password" name="confirm_password" class="form-control" required>
                                 </div>
                             </div>
                             <div class="col-md-12">

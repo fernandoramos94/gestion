@@ -9,7 +9,7 @@
             <div class="row gutter">
                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                     <div class="page-title">
-                        <h3>LISTA DE EMPLEADOS</h3>
+                        <h3>LISTA DE DATOS BANCARIOS</h3>
                     </div>
                 </div>
             </div>
@@ -19,27 +19,23 @@
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <div class="panel">
                     <div class="panel-body">
-                    <table id="TablaEmpleado" class="table table-striped table-condensed table-bordered no-margin">
+                    <table id="TablaBankdata" class="table table-striped table-condensed table-bordered no-margin">
 										<thead>
 										  <tr>
-									      <th>Nombre</th>
-									      <th>Apellido</th>
-									      <th>DNI/NIE</th>
-									      <th>Email</th>
-									      <th>Telefono movil</th>
-									      <th>Categoría</th>
+									      <th>IBAN</th>
+									      <th>Adjunto</th>
+									      <th>Fecha de creación</th>
 										  </tr>
 										</thead>
 										  
 										<tbody>
-                                        @foreach ($data as $employee)
+                                        @foreach ($data as $bankdata)
                                         <tr>
-												<td>{{ $employee->last_name }}</td>
-												<td>{{$employee->first_name }}</td>
-												<td>{{$employee->DNI_NIE}}</td>
-												<td>{{$employee->email}}</td>
-                                                <td>{{$employee->mobile_phone}}</td>
-                                                <td>{{$employee->categorie}}</td>    
+												<td>{{$bankdata->IBAN }}</td>
+												<td>
+                                                    <a href="{{asset('uploads')}}/{{$bankdata->url}}" download="{{$bankdata->url}}" class="btn btn-md btn-success"><span class="icon-download3"></span></a>
+                                                </td>
+                                                <td>{{$bankdata->created_at}}</td>  
 										  </tr>
 										  
                                         @endforeach
@@ -63,7 +59,7 @@
 <script type="text/javascript">
 // Basic DataTable
 $(function(){
-	$('#TablaEmpleado').DataTable({
+	$('#TablaBankdata').DataTable({
 		'iDisplayLength': 5,
 	});
 });

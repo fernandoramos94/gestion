@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Feedback;
 use Illuminate\Http\Request;
-
+use Auth;
+use Validator;
+use Illuminate\Support\Facades\DB;
 class FeedbackController extends Controller
 {
     /**
@@ -14,7 +16,17 @@ class FeedbackController extends Controller
      */
     public function index()
     {
-        //
+        if (Auth::user()->rol=='2' || (Auth::user()->rol=='3' )  )  {
+            $feedback = DB::table('users')
+        ->join('feedbacks_suggestions', 'users.id', '=', 'feedbacks_suggestions.user_id')
+        ->where('users.id', '=', Auth::user()->id)
+        ->get();
+        } else {
+            $feedback = DB::table('users')
+        ->join('feedbacks_suggestions', 'users.id', '=', 'feedbacks_suggestions.user_id')
+        ->get();
+        }
+        return view('feedback.index')->with('data',$feedback);
     }
 
     /**
@@ -24,7 +36,7 @@ class FeedbackController extends Controller
      */
     public function create()
     {
-        //
+        return view("feedback.create");
     }
 
     /**
@@ -35,7 +47,22 @@ class FeedbackController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'subject' => 'required',
+            'description' => 'required'
+        ]);
+
+        if ($validator ->fails()) {
+            return response()->json(['error'=>$validator->error()], 422);
+        }
+
+        $data = array (
+            'subject' => $request->get('subject'),
+            'description' => $request->get('description'),
+            'user_id' => Auth::user()->id
+        );
+        Feedback::create($data);
+        return redirect("home");
     }
 
     /**
