@@ -18,9 +18,18 @@ class CreateEmployeeTable extends Migration
             $table->increments('id');
             $table->string('last_name');
             $table->string('first_name');
-            $table->integer("DNI_NIE");
+            $table->string("DNI_NIE");
             $table->string("mobile_phone");
-            $table->string("categorie");
+            $table->string("pais_domicilio")->nullable();
+            $table->string("municipio_domicilio")->nullable();
+            $table->string("nacionalidad")->nullable();
+            $table->string("codigo_pais")->nullable();
+            $table->string("codigo_municipio")->nullable();
+            $table->string("niveEstudio")->nullable();
+            $table->string("fechaNacimiento")->nullable();
+            $table->text("firma")->nullable();
+            $table->string("nAfiliacion")->nullable();
+            $table->string("codigo_pais_domicilio")->nullable();
             $table->integer('user_id')->unsigned();
             $table->timestamps();
 

@@ -16,6 +16,11 @@ class FeedbackController extends Controller
      */
     public function index()
     {
+        
+        return view('feedback.index');
+    }
+    public function getFeedback()
+    {
         if (Auth::user()->rol=='2' || (Auth::user()->rol=='3' )  )  {
             $feedback = DB::table('users')
         ->join('feedbacks_suggestions', 'users.id', '=', 'feedbacks_suggestions.user_id')
@@ -26,7 +31,7 @@ class FeedbackController extends Controller
         ->join('feedbacks_suggestions', 'users.id', '=', 'feedbacks_suggestions.user_id')
         ->get();
         }
-        return view('feedback.index')->with('data',$feedback);
+        return response()->json($feedback);
     }
 
     /**

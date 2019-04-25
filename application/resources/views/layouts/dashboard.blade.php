@@ -6,10 +6,12 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta name="description" content="Gestion y Administracion" />
 		<meta name="keywords" content="Gestion y Admistracion" />
+		<meta name="csrf-token" content="{{ csrf_token() }}" />
 		<meta name="author" content="Fernando Ramos Timote" />
 		<link rel="shortcut icon" href="{{ asset('img/fav.png') }}">
 		<title>Gestión administrativa</title>
-		
+		<link rel="stylesheet" type="text/css" href="{{ asset('plugin/devextreme/dist/css/dx.common.css') }}" />
+		<link rel="stylesheet" type="text/css" href="{{ asset('plugin/devextreme/dist/css/dx.light.css') }}" />
 		<!-- Bootstrap CSS -->
 		<link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" media="screen" />
 
@@ -37,16 +39,28 @@
 		<!-- OdoMeter CSS -->
 		<link rel="stylesheet" href="{{ asset('css/odometer.css') }}" />
 
-		<!-- Data Tables -->
-		<link rel="stylesheet" href="{{ asset('css/datatables/dataTables.bs.min.css') }}">
-		<link rel="stylesheet" href="{{ asset('css/datatables/autoFill.bs.min.css') }}">
-		<link rel="stylesheet" href="{{ asset('css/datatables/fixedHeader.bs.css') }}">
 		<link rel="stylesheet" href="{{ asset('css/users.css') }}">
-		
-
+		<link rel="stylesheet" href="{{ asset('plugin/loading/jquery.loading.min.css') }}">
+		<link rel="stylesheet" href="{{ asset('css/toastr/toastr.min.css') }}">
+		<link href="{{ asset('fonts/font-awesome.css')}}" rel="stylesheet" />
+		<link href="{{ asset('css/wysiwyg-editor/editor.css') }}" rel="stylesheet" />
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+		<style>
+			.modal{
+				background: rgba(0,0,0,0.5);
+			}
+			.modal-content{
+				background-color: #fff;
+				box-shadow: none;
+				border-radius: 0;
+    			border: none;
+			}
+		</style>
 	</head>
 
-	<body>
+	<body ng-app="app">
+		<input type="hidden" id="url" value="{{url('')}}">
+		<input type="hidden" id="rolUser" value="{{Auth::user()->rol}}">
 
 		<!-- Header starts -->
 		<header>
@@ -121,13 +135,13 @@
 				  @if(Auth::user()->rol==1)
 				<li>
 					<a href="#">
-						<i class="icon-lab3"></i>
+						<i class="icon-briefcase3"></i>
 						<span class="menu-item">Empleados</span>
 						<span class="down-arrow"></span>
 					</a>
 					<ul>
 						<li>
-							<a href="{{url('/employee/')}}">Listar</a>
+							<a href="{{url('/employee/')}}">Mostrar</a>
 						</li>
 						<li>
 							<a href="{{url('/employee/create')}}">Agregar</a>
@@ -144,7 +158,7 @@
 					</a>
 					<ul>
 						<li>
-							<a href='#'>Listar</a>
+							<a href='#'>Mostrar</a>
 						</li>
 						<li>
 							<a href='#'>Agregar</a>
@@ -152,32 +166,52 @@
 					</ul>
 				</li>
 				@endif
+				@if(Auth::user()->rol == 3)
 				<li>
 					<a href='#'>
-						<i class="icon-colours"></i>
+						<i class="icon-user"></i>
+						<span class="menu-item">Datos personales</span>
+						<span class="down-arrow"></span>
+					</a>
+					<ul>
+						<li>
+							<a href="{{ url('/profile/')}}">Mostrar</a>
+						</li>
+					</ul>
+				</li>
+				@endif()
+				<li>
+					<a href='#'>
+						<i class="icon-folder3"></i>
 						<span class="menu-item">Documentos</span>
 						<span class="down-arrow"></span>
 					</a>
 					<ul>
 						<li>
-							<a href='#'>Listar</a>
+							<a href="{{ url('/documents/')}}">Mostrar Manuales</a>
 						</li>
 						@if(Auth::user()->rol==1)
 						<li>
-							<a href='#'>Agregar</a>
+							<a href="{{ url('/documents/create')}}">Agregar Manuales</a>
+						</li>
+						<li>
+							<a href="{{ url('/documents/documentSignature')}}">Mostrar Documentos con firmas</a>
+						</li>
+						<li>
+							<a href="{{ url('/documents/addDocument')}}">Agregar Documentos con firmas</a>
 						</li>
 						@endif
 					</ul>
 				</li>
 				<li>
 					<a href="#">
-						<i class="icon-head"></i>
+						<i class="icon-mail"></i>
 						<span class="menu-item">Feedback y sugerencias</span>
 						<span class="down-arrow"></span>
 					</a>
 					<ul>
 						<li>
-							<a href="{{url('/feedback/')}}">Listar</a>
+							<a href="{{url('/feedback/')}}">Mostrar</a>
 						</li>
 						<li>
 						<a href="{{url('/feedback/create')}}">Agregar</a>
@@ -186,16 +220,31 @@
 				</li>
 				<li>
 					<a href="#">
-						<i class="icon-head"></i>
+						<i class="icon-paper"></i>
 						<span class="menu-item">Datos bancarios</span>
 						<span class="down-arrow"></span>
 					</a >
 					<ul>
 						<li>
-							<a href="{{url('/bankdata')}}">Listar</a>
+							<a href="{{url('/bankdata')}}">Mostrar</a>
 						</li>
 						<li>
 						<a href="{{url('/bankdata/create')}}">Agregar</a>
+						</li>
+					</ul>
+				</li>
+				<li>
+					<a href="#">
+						<i class="icon-paper"></i>
+						<span class="menu-item">Nómina</span>
+						<span class="down-arrow"></span>
+					</a >
+					<ul>
+						<li>
+							<a href="{{url('/nomina')}}">Mostrar</a>
+						</li>
+						<li>
+						<a href="{{url('/nomina/create')}}">Solicitud / Revisión</a>
 						</li>
 					</ul>
 				</li>
@@ -216,6 +265,11 @@
 
 		<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 		<script src="{{ asset('js/jquery.js') }}"></script>
+		<script src="{{ asset('js/angular.min.js') }}"></script>
+		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-sanitize/1.7.8/angular-sanitize.min.js"></script>
+
+
 
 		<!-- Include all compiled plugins (below), or include individual files as needed -->
 		<script src="{{ asset('js/bootstrap.min.js') }}"></script>
@@ -277,8 +331,19 @@
 		<script src="{{ asset('js/datatables/autoFill.bootstrap.min.js')}}"></script>
 		<script src="{{ asset('js/datatables/fixedHeader.min.js')}}"></script>
 
+		<script src="{{ asset('plugin/loading/jquery.loading.min.js') }}"></script>
+		<script src="{{ asset('js/toastr/toastr.min.js') }}"></script>
+		<script src="{{ asset('js/wysiwyg-editor/editor.js') }}"></script>
+		
+		<script type="text/javascript" src="{{ asset('plugin/devextreme/dist/js/dx.all.js') }}"></script>
+
+		<script type="text/javascript" src="{{ asset('plugin/signature/flashcanvas.js') }}"></script>
+		<script type="text/javascript" src="{{ asset('plugin/signature/jSignature.min.js') }}"></script>
+
 		<!-- Custom JS -->
 		<script src="{{ asset('js/custom.js') }}"></script>
+		<script src="{{ asset('js/controllers/app.js') }}"></script>
+		
 		@yield('js')
 	</body>
 </html>

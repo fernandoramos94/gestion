@@ -15,7 +15,13 @@ class CreateNominaRevisionTable extends Migration
     {
         Schema::create('nomina_revision', function (Blueprint $table) {
             $table->increments('id');
+            $table->string("periodo");
+            $table->string("motivo");
+            $table->string("adjunto");
+            $table->integer('user_id')->unsigned();
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 

@@ -50,6 +50,11 @@ $dribbble: #ea4c89;
 	background-image: -o-linear-gradient(top, $fromColor, $toColor); // Opera 11.10+
 	background-image: linear-gradient(top, $fromColor, $toColor);
 }
+tr.dx-row.dx-column-lines.dx-header-row{
+    color: #fff !important;
+    background: #4e1c56 !important;
+ }
+ 
 
 // Transition
 @mixin transition($transition-property, $transition-time, $method) {

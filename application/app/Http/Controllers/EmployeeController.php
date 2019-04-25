@@ -6,7 +6,11 @@ use App\Employee;
 use Illuminate\Http\Request;
 use Validator;
 use App\User;
+use Mail;
+use Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+
 class EmployeeController extends Controller
 {
     /**
@@ -16,10 +20,47 @@ class EmployeeController extends Controller
      */
     public function index()
     {
+        return view('employee.index');
+    }
+
+    public function getEmployee()
+    {
         $employee = DB::table('users')
         ->join('employee', 'users.id', '=', 'employee.user_id')
         ->get();
-        return view('employee.index')->with('data',$employee);
+        return response()->json($employee);
+    }
+
+    public function profile(Request $request)
+    {
+        $employee = DB::table('users')
+        ->join('employee', 'users.id', '=', 'employee.user_id')
+        ->where('users.id', $request->get("idUsuario"))
+        ->first();
+
+        return response()->json($employee);
+    }
+    public function updateProfile(Request $request)
+    {
+        DB::table('employee')
+        ->where('user_id', $request->get("id"))
+        ->update([
+            "last_name" => $request->get('last_name'),
+            "first_name" => $request->get('first_name'),
+            "DNI_NIE" => $request->get('DNI_NIE'),
+            "mobile_phone" => $request->get('mobile_phone'),
+            "pais_domicilio" => $request->get("pais_domicilio"),
+            "municipio_domicilio" => $request->get("municipio_domicilio"),
+            "nacionalidad" => $request->get("nacionalidad"),
+            "codigo_pais" => $request->get("codigo_pais"),
+            "codigo_municipio" => $request->get("codigo_municipio"),
+            "niveEstudio" => $request->get("niveEstudio"),
+            "fechaNacimiento" => $request->get("fechaNacimiento"),
+            "nAfiliacion" => $request->get("nAfiliacion"),
+            "codigo_pais_domicilio"=>$request->get("codigo_pais_domicilio")
+        ]);
+
+        return response()->json("datos actualizados");
     }
 
     /**
@@ -40,39 +81,54 @@ class EmployeeController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request);
-        // $validator = Validator::make($request->all(), [
-        //     'last_name' => 'required',
-        //     'first_name' => 'required',
-        //     'DNI_NIE' => 'required',
-        //     'email' => 'required|email',
-        //     'mobile_phone' => 'required',
-        //     'categorie' => 'required',
-        //     'password' => 'required',
-        //     'confirm_password' => 'required|same:password'
-        // ]);
-
-        // if ($validator ->fails()) {
-        //     return response()->json(['error'=>$validator->error()], 422);
-        // }
+        $logitud = 8;
+        $psswd = substr( md5(microtime()), 1, $logitud);
 
         $data = array (
             "name" => $request->get('last_name')." ".$request->get('first_name'),
             "email" => $request->get('email'),
             "rol" => '3',
-            "password" => bcrypt($request->get('password'))
+            "password" => bcrypt($psswd)
         );
         $user = User::create($data);
+        
         $data_employe = array (
             "last_name" => $request->get('last_name'),
             "first_name" => $request->get('first_name'),
             "DNI_NIE" => $request->get('DNI_NIE'),
             "mobile_phone" => $request->get('mobile_phone'),
-            "categorie" => $request->get('categorie'),
-            "user_id" => $user->id
+            "user_id" => $user->id,
+            "pais_domicilio" => $request->get("pais_domicilio"),
+            "municipio_domicilio" => $request->get("municipio_domicilio"),
+            "nacionalidad" => $request->get("nacionalidad"),
+            "codigo_pais" => $request->get("codigo_pais"),
+            "codigo_municipio" => $request->get("codigo_municipio"),
+            "niveEstudio" => $request->get("niveEstudio"),
+            "fechaNacimiento" => $request->get("fechaNacimiento"),
+            "nAfiliacion" => $request->get("nAfiliacion"),
+            "codigo_pais_domicilio"=>$request->get("codigo_pais_domicilio")
         );
         Employee::create($data_employe);
-        return redirect("employee");
+        
+        $dataCliente_user = DB::table("client_user")->insert(
+            ['id_client' => $request->get("client"), 'id_user'=> $user->id]
+        );
+
+        $dataCategorieUser = DB::table('categorie_user')->insert(
+            ['id_categorie' => $request->get("categorie"), 'id_user'=>$user->id]
+        );
+        $dataSend = array(
+            'nombre' => $request->get('last_name')." ".$request->get('first_name'),
+            'email' => $request->get('email'),
+            'pass' => $psswd
+        );
+
+        Mail::send('email.assignedUser', ['data' => $dataSend], function ($m) use ($dataSend) {
+            $m->from('no-reply@ohlimpiacanarias.com', 'ohlimpiacanarias');
+
+            $m->to($dataSend['email'], $dataSend['nombre'])->subject('Asignación de usuario');
+        });
+        return response()->json("El empleado se ha registrado de forma exitosa");
     }
 
     /**

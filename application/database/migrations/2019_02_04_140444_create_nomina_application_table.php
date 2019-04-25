@@ -15,9 +15,9 @@ class CreateNominaApplicationTable extends Migration
     {
         Schema::create('nomina_application', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('mounth');
-            $table->string('year');
-            $table->string('url');
+            $table->string('periodo');
+            $table->string('motivo');
+            $table->string('adjunto');
             $table->integer('user_id')->unsigned();
             $table->timestamps();
 

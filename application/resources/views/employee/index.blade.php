@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 
 @section('content')
-<div class="dashboard-wrapper dashboard-wrapper-lg">
+<div class="dashboard-wrapper dashboard-wrapper-lg" ng-controller="employeeController" ng-init="getEmployee()">
 
     <!-- Container fluid Starts -->
     <div class="container-fluid">
@@ -16,63 +16,10 @@
         </div>
         <!-- Row starts -->
         <div class="row gutter">
-        <!-- @foreach ($data as $employee)
-            <div class="col-md-4 col-sm-6 col-xs-12">
-                <div class="users-wrapper red">
-                    <div class="users-info clearfix">
-                        <div class="users-avatar">
-                            <img src="img/thumbs/user3.png" class="img-responsive" alt="Arise Admin">
-                        </div>
-                        <div class="users-detail">
-                            <h5>{{ $employee->last_name }} {{$employee->first_name }}</h5>
-                            <p>UX Designer</p>
-                        </div>
-                    </div>
-                    <ul class="users-footer clearfix">
-                        <li>
-                            <p class="light">Correo</p>
-                            <p>Canada</p>
-                        </li>
-                        <li>
-                            <p class="light">Telefono movil</p>
-                            <p>{{$employee->email}}</p>
-                        </li>
-                        <li>
-                            <a href="#" class="add-btn added">
-                                <i class="icon-check"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        @endforeach -->
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <div class="panel">
                     <div class="panel-body">
-                        <table id="TablaEmpleado" class="table table-striped table-condensed table-bordered no-margin">
-                            <thead>
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th>Apellido</th>
-                                    <th>DNI/NIE</th>
-                                    <th>Email</th>
-                                    <th>Telefono movil</th>
-                                    <th>Categoría</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($data as $employee)
-                                    <tr>
-                                        <td>{{ $employee->last_name }}</td>
-                                        <td>{{$employee->first_name }}</td>
-                                        <td>{{$employee->DNI_NIE}}</td>
-                                        <td>{{$employee->email}}</td>
-                                        <td>{{$employee->mobile_phone}}</td>
-                                        <td>{{$employee->categorie}}</td>    
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                        <div id="grilla"></div>
                     </div>
                 </div>
             </div> 
@@ -80,17 +27,31 @@
         <!-- Row ends -->
     </div>
     <!-- Container fluid ends -->
+    <div class="modal fade" tabindex="-1" id="aplicaciones" role="dialog">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Generación de contrato</h4>
+                    </div>
+                <div class="modal-body">
+                    <div class="col-lg-12"> 
+                    </div>
+                    <div class="col-lg-12">
+                        <div id="grillaContrato"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-success">Guardar</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
     
 </div>
 
 @stop
-@section('js')
-<script type="text/javascript">
-// Basic DataTable
-$(function(){
-	$('#TablaEmpleado').DataTable({
-		'iDisplayLength': 5,
-	});
-});
-</script>
+@section("js")
+    <script src="{{asset('js/controllers/employeeController.js')}}"></script>
 @stop

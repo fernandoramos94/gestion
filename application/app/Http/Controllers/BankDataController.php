@@ -47,11 +47,15 @@ class BankDataController extends Controller
      */
     public function store(Request $request)
     {
-        $file = $request->file('url');
-        \Storage::disk('local')->put($file->getClientOriginalName(),  \File::get($file));
+        $fileName = "";
+        if($request->file("url")){
+            $file = $request->file('url');
+            \Storage::disk('local')->put($file->getClientOriginalName(),  \File::get($file));
+            $fileName = $file->getClientOriginalName();
+        }
         $data = array (
-            "IBAN" => $request->get('IBAN'),
-            "url" => $file->getClientOriginalName(),
+            "IBAN" => $request->get('input1')."".$request->get('input2')."".$request->get('input3')."".$request->get('input4')."".$request->get('input5'),
+            "url" => $fileName,
             'user_id' => Auth::user()->id
         );
         Bankdata::create($data);
