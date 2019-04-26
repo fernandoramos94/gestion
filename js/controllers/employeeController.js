@@ -1,11 +1,12 @@
 app.controller("employeeController", function ($scope, $location, $timeout, $filter) {
     $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content') } });
     $scope.contratos =  [
-        { ID: 1, name: "401"},
-        { ID: 2, name: "402"},
-        { ID: 3, name: "501"},
-        { ID: 3, name: "502"}
+        { ID: 401, name: "401"},
+        { ID: 402, name: "402"},
+        { ID: 501, name: "501"},
+        { ID: 502, name: "502"}
     ];
+    $scope.contratosDetalles = [];
     $scope.init = function () {
         
         $scope.paises();
@@ -124,7 +125,26 @@ app.controller("employeeController", function ($scope, $location, $timeout, $fil
             url: url + "/api/getEmployee",
             method: "GET",
             success: function (resp) {
-                pintarGrilla(resp);
+                var dataresp = resp.filter(function(r){
+                    r.contratos = [];
+                    $.ajax({
+                        url: url+"/getContratos",
+                        method:"post",
+                        data: {user_id: r.user_id},
+                        success: function(re){
+                            r.contratos = re;
+                        }, error: function(err){
+                            console.log(err);
+                        }
+                    })
+                    return r;
+                });
+                $timeout(function(){
+                    console.log(dataresp);
+                    pintarGrilla(dataresp);
+                    $scope.$apply()
+                },500)
+                
             }, error: function (error) {
                 console.log(error);
             }
@@ -189,7 +209,7 @@ app.controller("employeeController", function ($scope, $location, $timeout, $fil
             method: "POST",
             data: $scope.datosPerfil,
             success: function (resp) {
-                $scope.loading(false, "Actualizando su información");
+                $scope.loading(false, "");
                 mensaje("Sus datos han sido actualizado de forma exitosa", "success");
                 location.reload();
             }, error: function (error) {
@@ -204,6 +224,7 @@ app.controller("employeeController", function ($scope, $location, $timeout, $fil
         return da[0].codigo;
     }
     var pintarGrilla = function (data) {
+        $scope.loading(false, "");
         var grilla = $("#grilla").dxDataGrid({
             dataSource: data,
             columnAutoWidth: true,
@@ -234,12 +255,11 @@ app.controller("employeeController", function ($scope, $location, $timeout, $fil
                     dataField: "email",
                     caption: "Correo"
                 }, {
-                    caption: "Opciónes", width: "100", 
+                    caption: "",
+                    alignment: "center",
+                    width: 100,
                     cellTemplate: function (container, opcion) {
                         $('<span>&nbsp;</span>').appendTo(container);
-                        $('<span class="icon-inbox3 btn btn-md btn-info" data-toggle="tooltip" title="Generar PDF"></span>').on("click", function () {
-                            window.open(url + "/getPdf/" + opcion.data.user_id, '_blank');
-                        }).appendTo(container);
                         $('<span>&nbsp;</span>').appendTo(container);
                         $('<span class="icon-edit btn btn-md btn-danger" data-toggle="tooltip" title="Actualizar Información"></span>').on("click", function () {
                             localStorage.setItem("idEmpleado", opcion.data.user_id);
@@ -273,21 +293,36 @@ app.controller("employeeController", function ($scope, $location, $timeout, $fil
                 showPageSizeSelector: true,
                 visible: true
             },
+            stateStoring: {
+                enabled:true
+            },
             masterDetail: {
                 enabled: true,
+                autoExpandAll: true,
                 template: function (container, options) {
-                    var currentEmployeeData = options.data;
+                    var dataMaster = options.data;
+                    $scope.contratosDetalles = options.data.contratos;
                     $("<h4>")
                         .addClass("master-detail-caption")
                         .text("Contratos")
                         .appendTo(container);
 
-                    $("<div>")
-                    
-                        .dxDataGrid({
+                    var grillaMaestro = $("<div>").dxDataGrid({
                             columnAutoWidth: true,
                             showBorders: true,
                             columns: [{
+                                caption: "Generar PDF",
+                                width: 110,
+                                alignment: "center", 
+                                allowEditing: false,
+                                cellTemplate: function (container, opcion) {
+                                    $('<span>&nbsp;</span>').appendTo(container);
+                                    $('<span class="icon-inbox3 btn btn-md btn-info" data-toggle="tooltip" title="Generar PDF"></span>').on("click", function () {
+                                        window.open(url + "/getPdf/" + opcion.data.user_id, '_blank');
+                                    }).appendTo(container);
+                                    $('<span>&nbsp;</span>').appendTo(container);
+                                }
+                            }, {
                                 dataField: "TipoContrato",
                                 lookup: {
                                     dataSource: function(options) {
@@ -305,18 +340,60 @@ app.controller("employeeController", function ($scope, $location, $timeout, $fil
                                 dataField: "MotivoContratacion",
                                 
                             }],
+                            onRowInserted: function(e){
+                                $.ajax({
+                                    url: url+"/creacionContrato",
+                                    method: "post",
+                                    data: {
+                                        FechaFin: e.data.FechaFin,
+                                        MotivoContratacion: e.data.MotivoContratacion,
+                                        TipoContrato: e.data.TipoContrato,
+                                        user_id: dataMaster.user_id,
+                                        tipoAccion: "new"
+                                    },
+                                    success: function(re){
+                                        $scope.getEmployee();
+                                    },error: function(err){
+                                        console.log(err);
+                                    }
+                                })
+                            },
+                            onRowUpdated: function(e){
+                                $.ajax({
+                                    url: url+"/creacionContrato",
+                                    method: "post",
+                                    data: {
+                                        FechaFin: e.key.FechaFin,
+                                        MotivoContratacion: e.key.MotivoContratacion,
+                                        TipoContrato: e.key.TipoContrato,
+                                        id: e.key.id,
+                                        tipoAccion: "update"
+                                    },
+                                    success: function(re){
+                                        $scope.getEmployee();
+                                    },error: function(err){
+                                        console.log(err);
+                                    }
+                                })
+                            },
                             editing: {
                                 allowAdding: true,
                                 allowUpdating: true,
                                 mode: "row",
                                 texts: {
                                     saveRowChanges: "Guardar",
-                                    cancelRowChanges: "Cancelar"
+                                    cancelRowChanges: "Cancelar",
+                                    editRow: "Modificar",
+                                    useIcons: true
                                 }
                             },
-                            dataSource: [],
+                            //dataSource: dataMaster.contratos,
+                            dataSource: new DevExpress.data.DataSource({
+                                store: $scope.contratosDetalles
+                            }),
                             noDataText: "No hay contratos"
                         }).appendTo(container);
+                        grillaMaestro.dxDataGrid("instance").option("dataSource", $scope.contratosDetalles);
                 }
             }
         }).dxDataGrid("instance");

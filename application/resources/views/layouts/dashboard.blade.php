@@ -194,12 +194,6 @@
 						<li>
 							<a href="{{ url('/documents/create')}}">Agregar Manuales</a>
 						</li>
-						<li>
-							<a href="{{ url('/documents/documentSignature')}}">Mostrar Documentos con firmas</a>
-						</li>
-						<li>
-							<a href="{{ url('/documents/addDocument')}}">Agregar Documentos con firmas</a>
-						</li>
 						@endif
 					</ul>
 				</li>

@@ -23,6 +23,35 @@ class EmployeeController extends Controller
         return view('employee.index');
     }
 
+    public function contrato(Request $request)
+    {
+        if ($request->get("tipoAccion") == "new") {
+            $contrato = DB::table('contratos_empleado')->insert(
+                ['user_id' => $request->get("user_id"), 'TipoContrato'=>$request->get("TipoContrato"), "MotivoContratacion"=>$request->get("MotivoContratacion"), "FechaFin"=>$request->get("FechaFin")]
+            );
+        } else {
+            DB::table('contratos_empleado')
+            ->where('id', $request->get("id"))
+            ->update([
+                'TipoContrato' => $request->get("TipoContrato"), 
+                "MotivoContratacion" => $request->get("MotivoContratacion"),
+                "FechaFin" => $request->get("FechaFin")
+            ]);
+        }
+        
+        
+        return response()->json("Contratos almacenado de forma exitosa.");
+    }
+    
+    public function getContrato(Request $request)
+    {
+        $contratos = DB::table('contratos_empleado')
+        ->where('contratos_empleado.user_id', $request->get("user_id"))
+        ->get();
+
+        return response()->json($contratos);
+    }
+
     public function getEmployee()
     {
         $employee = DB::table('users')

@@ -69,6 +69,9 @@ Route::get("profile", function(){
     return view('employee.profile');
 });
 
+Route::post("/creacionContrato", "EmployeeController@contrato");
+Route::post("/getContratos", "EmployeeController@getContrato");
+
 
 // apis
 
