@@ -23,6 +23,26 @@ class EmployeeController extends Controller
         return view('employee.index');
     }
 
+    public function getContratosFirmado()
+    {
+        $contratos = DB::table("contratos_empleado")
+        ->join('employee', 'contratos_empleado.user_id', '=', 'employee.user_id')
+        ->join('document_signature', 'document_signature.user_id', '=', 'employee.user_id')
+        ->where([["employee.user_id", "=", Auth::user()->id], ["contratos_empleado.Firmado", '=', "Si"]])
+        ->get();
+
+        return response()->json($contratos);
+    }
+
+    public function getContratoSinFirmar()
+    {
+        $contratos = DB::table("employee")
+        ->join('contratos_empleado', 'contratos_empleado.user_id', '=', 'employee.user_id')
+        ->where([["employee.user_id", "=", Auth::user()->id], ["contratos_empleado.Firmado", '=', "No"]])
+        ->get();
+        return response()->json($contratos);
+    }
+
     public function contrato(Request $request)
     {
         if ($request->get("tipoAccion") == "new") {

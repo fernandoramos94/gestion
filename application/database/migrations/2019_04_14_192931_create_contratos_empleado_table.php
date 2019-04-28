@@ -19,6 +19,7 @@ class CreateContratosEmpleadoTable extends Migration
             $table->integer("user_id")->unsigned();
             $table->string("FechaFin")->nullable();
             $table->string("MotivoContratacion")->nullable();
+            $table->string("Firmado")->default("No");
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users');
         });

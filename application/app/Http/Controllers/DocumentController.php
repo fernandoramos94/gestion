@@ -64,6 +64,22 @@ class DocumentController extends Controller
 
         return response()->json($documents);
     }
+
+    public function firmaDocumento(Request $request)
+    {
+       DB::table('document_signature')->insert([
+            "firma" => $request->get("firma"),
+            "user_id" => $request->get("user_id"),
+            "contrato_id" => $request->get("contrato_id")
+        ]);
+        DB::table('contratos_empleado')
+        ->where('id', $request->get("contrato_id"))
+        ->update([
+            'Firmado' => "Si"
+        ]);
+        return response()->json(true);
+    }
+
     public function getAllDocumentClient()
     {
         if(Auth::user()->rol == 1){

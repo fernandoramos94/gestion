@@ -6,6 +6,14 @@ app.controller("employeeController", function ($scope, $location, $timeout, $fil
         { ID: 501, name: "501"},
         { ID: 502, name: "502"}
     ];
+    $("#firmar").on("show.bs.modal", function(){
+        var $sigdiv = $("#signature");
+        $sigdiv.jSignature();
+        $sigdiv.resize();
+    });
+    $("#firmar").on('hidden.bs.modal', function(){
+        $("#signature").html("");
+    });
     $scope.contratosDetalles = [];
     $scope.init = function () {
         
@@ -150,6 +158,122 @@ app.controller("employeeController", function ($scope, $location, $timeout, $fil
             }
         })
     }
+    $scope.getContratos = function(){
+
+        $.ajax({
+            url: url + "/api/getContratosFirmados",
+            method: "get",
+            success: function (resp) {
+                $timeout(function () {
+                    $scope.contratosFirmados = resp;
+                    $scope.loading(false, "Cargando...");
+                    grillaFirmados();
+                    $scope.$apply();
+                })
+                
+
+            }, error: function (error) {
+                console.log(error);
+            }
+        });
+        $.ajax({
+            url: url + "/api/getContratosNoFirmados",
+            method: "get",
+            success: function (resp) {
+                $timeout(function () {
+                    $scope.contratosNoFirmados = resp;
+                    $scope.loading(false, "Cargando...");
+                    grillaNoFirmados();
+                    $scope.$apply();
+                })
+            }, error: function (error) {
+                console.log(error);
+            }
+        });
+    }
+
+    var grillaFirmados = function(){
+        $("#grillaFirmados").dxDataGrid({
+            dataSource: $scope.contratosFirmados,
+            columns: [{
+                dataField: "TipoContrato",
+                caption: "Contrato"
+            },{
+                dataField: "FechaFin"
+            }, {
+                dataField: "MotivoContratacion"
+            }, {
+                caption: "",
+                alignment: "center",
+                cellTemplate: function(content, option){
+                    $('<span class="icon-inbox3 btn btn-md btn-info" data-toggle="tooltip" title="Generar PDF"></span>').on("click", function () {
+                        window.open(url + "/getPdf/" + option.data.user_id, '_blank');
+                    }).appendTo(content);
+                }
+            }],
+            noDataText: "No hay contratos firmados",
+            showBorders: true,
+            hoverStateEnabled: true
+        })
+    }
+    var grillaNoFirmados = function(){
+        $("#grillaNoFirmados").dxDataGrid({
+            dataSource: $scope.contratosNoFirmados,
+            columns: [{
+                dataField: "TipoContrato",
+                caption: "Contrato"
+            },{
+                dataField: "FechaFin"
+            }, {
+                dataField: "MotivoContratacion"
+            }, {
+                caption: "",
+                alignment: "center",
+                cellTemplate: function(content, option){
+                    $("<a>", {
+                        class: "btn btn-success",
+                        text: "Firmar"
+                    }).on("click", function(e){
+                        $("#firmar").modal({
+                            show: true,
+                            backdrop: "static",
+                            keyboard: false
+                        });
+                        localStorage.setItem("EmpleadoContrato", JSON.stringify(option.data));
+                    }).appendTo(content);
+                }
+            }],
+            noDataText: "No hay contratos por firmar",
+            showBorders: true,
+            hoverStateEnabled: true
+        })
+    }
+
+    $scope.firmarContrato = function(){
+        var datacontrato = JSON.parse(localStorage.getItem("EmpleadoContrato"));
+        var dataSend = {
+            firma: $("#signature").jSignature("getData"),
+            user_id: datacontrato.user_id,
+            contrato_id: datacontrato.id
+        }
+        $scope.loading(true, "Firmando Contrato...");
+        $("#firmar").modal("hide");
+
+        $.ajax({
+            url: url + "/firmarContrato",
+            method: "post",
+            data: dataSend,
+            success: function(response){
+                $scope.loading(false, "");
+                mensaje("Se ha firmado el documento de forma exitosa", "success");
+                location.reload();
+            },error: function(err){
+                mensaje("Se ha presentado un error al firmar el contrato", "error");
+                console.log(err);
+            }
+        })
+    }
+
     $scope.profile = function () {
 
         $scope.loading(true, "Cargando...");
@@ -273,6 +397,17 @@ app.controller("employeeController", function ($scope, $location, $timeout, $fil
             onToolbarPreparing: function (e) {
                 var dataGrid = e.component;
                 e.toolbarOptions.items.unshift({
+                    location: "before",
+                    widget: "dxButton",
+                    options: {
+                        class: "btn-success",
+                        icon: "add",
+                        text: "Agregar Nuevo",
+                        onClick: function () {
+                            location.href = url+"/employee/create"
+                        }
+                    }
+                }, {
                     location: "after",
                     widget: "dxButton",
                     options: {
@@ -298,7 +433,7 @@ app.controller("employeeController", function ($scope, $location, $timeout, $fil
             },
             masterDetail: {
                 enabled: true,
-                autoExpandAll: true,
+                autoExpandAll: false,
                 template: function (container, options) {
                     var dataMaster = options.data;
                     $scope.contratosDetalles = options.data.contratos;
@@ -316,9 +451,20 @@ app.controller("employeeController", function ($scope, $location, $timeout, $fil
                                 alignment: "center", 
                                 allowEditing: false,
                                 cellTemplate: function (container, opcion) {
+                                    var dis = opcion.data.Firmado == "Si" ? false : true;
                                     $('<span>&nbsp;</span>').appendTo(container);
-                                    $('<span class="icon-inbox3 btn btn-md btn-info" data-toggle="tooltip" title="Generar PDF"></span>').on("click", function () {
-                                        window.open(url + "/getPdf/" + opcion.data.user_id, '_blank');
+                                    $('<span>', {
+                                        class: "icon-inbox3 btn btn-md btn-info",
+                                        "data-toggle": "tooltip",
+                                        title: "Generar PDF",
+                                        disabled: dis
+                                    }).on("click", function () {
+                                        if(!dis){
+                                            window.open(url + "/getPdf/" + opcion.data.user_id, '_blank');
+                                        }else{
+                                            mensaje("El documento se encuentra sin firmar", "warning");
+                                        }
+                                        
                                     }).appendTo(container);
                                     $('<span>&nbsp;</span>').appendTo(container);
                                 }

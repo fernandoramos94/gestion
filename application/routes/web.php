@@ -64,6 +64,8 @@ Route::post("/updateSolicitud", "NominaController@update");
 Route::post("/dataProfile", "EmployeeController@profile");
 Route::post("/updateProfile", "EmployeeController@updateProfile");
 
+Route::post("/firmarContrato", "DocumentController@firmaDocumento");
+
 
 Route::get("profile", function(){
     return view('employee.profile');
@@ -71,6 +73,9 @@ Route::get("profile", function(){
 
 Route::post("/creacionContrato", "EmployeeController@contrato");
 Route::post("/getContratos", "EmployeeController@getContrato");
+Route::get("/mycontracts", function(){
+    return view("employee.misContratos");
+});
 
 
 // apis
@@ -85,3 +90,6 @@ Route::get('/api/getDocumentCategorie', 'DocumentController@getAllDocument');
 Route::get('/api/getDocumentClient', 'DocumentController@getAllDocumentClient');
 Route::get("/api/getSolicitudNomina", "NominaController@getSolicitudes");
 Route::get("/api/getRevisionNomina", "NominaController@getRevisiones");
+
+Route::get("/api/getContratosFirmados", "EmployeeController@getContratosFirmado");
+Route::get("/api/getContratosNoFirmados", "EmployeeController@getContratoSinFirmar");

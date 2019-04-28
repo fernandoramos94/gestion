@@ -132,7 +132,7 @@
 						<span class="menu-item">Inicio</span>
 					</a>
 				</li>
-				  @if(Auth::user()->rol==1)
+				@if(Auth::user()->rol==1)
 				<li>
 					<a href="#">
 						<i class="icon-briefcase3"></i>
@@ -178,6 +178,14 @@
 							<a href="{{ url('/profile/')}}">Mostrar</a>
 						</li>
 					</ul>
+				</li>
+				@endif()
+				@if(Auth::user()->rol == 3)
+				<li>
+					<a href="{{url('/mycontracts')}}">
+						<i class="icon-paper"></i>
+						<span class="menu-item">Mis Contratos</span>
+					</a>
 				</li>
 				@endif()
 				<li>
